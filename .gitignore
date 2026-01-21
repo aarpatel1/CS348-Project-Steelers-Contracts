@@ -1,0 +1,19 @@
+# IntelliJ / VS Code
+.idea/
+.vscode/
+
+# Maven / Gradle
+target/
+build/
+.gradle/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+application-local.properties
