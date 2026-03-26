@@ -38,36 +38,3 @@ Notes:
 I used Cursor/AI to help generate code structure, SQL ideas, and UI scaffolding.
 I reviewed, tested, and modified the output.
 I understand and can explain the final code.
-
-## Suggested 5-10 Minute Demo Script
-1. **Open app and describe architecture (1 min)**
-   - Show `/contracts` page.
-   - Say: "This app uses Spring Boot MVC + service/repository layers + relational schema with FK relationships."
-
-2. **Show database design in code (1-2 min)**
-   - Open `src/main/resources/schema.sql` and point out PK/FK constraints.
-   - Open entity classes (`Team`, `Position`, `Player`, `Contract`) and mention `@ManyToOne` relationships.
-
-3. **Demonstrate CRUD on contracts (2-3 min)**
-   - Click **Create Contract**.
-   - Highlight player dropdown is DB-driven.
-   - Save a new contract.
-   - Edit one contract (change cap hit/status).
-   - Delete one contract.
-   - Say: "This satisfies insert/update/delete on one table (`contracts`)."
-
-4. **Demonstrate report filtering (2 min)**
-   - Go to `/reports`.
-   - Set filters (Team = Steelers, Position = Linebacker, cap hit range).
-   - Apply filters and explain report columns including years remaining.
-
-5. **Show before/after report evidence (1 min)**
-   - Keep report open and note a specific cap hit/status.
-   - Go edit that contract from `/contracts`.
-   - Return to report, reapply filter, show updated value.
-   - Say: "This is the report before and after data changes."
-
-6. **Show dynamic dropdown source code (1 min)**
-   - Open `ContractController` and `ReportController`.
-   - Show model attributes for players/teams/positions from services/repositories.
-   - Say: "Dropdowns are loaded from DB tables, not hard-coded."
