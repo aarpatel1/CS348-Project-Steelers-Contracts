@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Contracts</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Pittsburgh Steelers Salary Cap Manager</h1>
+
+    <div class="actions">
+        <a class="btn" th:href="@{/contracts/new}">Create Contract</a>
+        <a class="btn secondary" th:href="@{/reports}">View Salary Report</a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Player</th>
+            <th>Team</th>
+            <th>Position</th>
+            <th>Years</th>
+            <th>Base Salary</th>
+            <th>Cap Hit</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contract : ${contracts}">
+            <td th:text="${contract.player.fullName}">Player Name</td>
+            <td th:text="${contract.player.team.teamName}">Team</td>
+            <td th:text="${contract.player.position.positionName}">Position</td>
+            <td>
+                <span th:text="${contract.startYear}">2024</span> -
+                <span th:text="${contract.endYear}">2026</span>
+            </td>
+            <td th:text="${#numbers.formatDecimal(contract.baseSalary, 1, 'COMMA', 2, 'POINT')}">0</td>
+            <td th:text="${#numbers.formatDecimal(contract.capHit, 1, 'COMMA', 2, 'POINT')}">0</td>
+            <td th:text="${contract.contractStatus}">ACTIVE</td>
+            <td>
+                <a th:href="@{'/contracts/' + ${contract.contractId} + '/edit'}">Edit</a>
+                <form th:action="@{'/contracts/' + ${contract.contractId} + '/delete'}" method="post" class="inline">
+                    <button type="submit" class="link-btn">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

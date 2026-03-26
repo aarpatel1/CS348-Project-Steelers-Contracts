@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle}">Contract Form</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${pageTitle}">Contract Form</h1>
+
+    <form th:action="${formAction}" method="post" th:object="${contract}">
+        <label for="playerId">Player</label>
+        <select id="playerId" name="playerId" required>
+            <option value="">-- Select Player --</option>
+            <option th:each="p : ${players}"
+                    th:value="${p.playerId}"
+                    th:text="${p.fullName + ' (' + p.team.abbreviation + ' - ' + p.position.positionName + ')'}"
+                    th:selected="${contract.player != null and contract.player.playerId == p.playerId}">
+            </option>
+        </select>
+
+        <label for="startYear">Start Year</label>
+        <input id="startYear" type="number" th:field="*{startYear}" required>
+        <div class="field-error" th:if="${#fields.hasErrors('startYear')}" th:errors="*{startYear}">Invalid</div>
+
+        <label for="endYear">End Year</label>
+        <input id="endYear" type="number" th:field="*{endYear}" required>
+        <div class="field-error" th:if="${#fields.hasErrors('endYear')}" th:errors="*{endYear}">Invalid</div>
+
+        <label for="baseSalary">Base Salary</label>
+        <input id="baseSalary" type="number" step="0.01" th:field="*{baseSalary}" required>
+        <div class="field-error" th:if="${#fields.hasErrors('baseSalary')}" th:errors="*{baseSalary}">Invalid</div>
+
+        <label for="signingBonus">Signing Bonus</label>
+        <input id="signingBonus" type="number" step="0.01" th:field="*{signingBonus}" required>
+        <div class="field-error" th:if="${#fields.hasErrors('signingBonus')}" th:errors="*{signingBonus}">Invalid</div>
+
+        <label for="capHit">Cap Hit</label>
+        <input id="capHit" type="number" step="0.01" th:field="*{capHit}" required>
+        <div class="field-error" th:if="${#fields.hasErrors('capHit')}" th:errors="*{capHit}">Invalid</div>
+
+        <label for="guaranteedMoney">Guaranteed Money</label>
+        <input id="guaranteedMoney" type="number" step="0.01" th:field="*{guaranteedMoney}" required>
+        <div class="field-error" th:if="${#fields.hasErrors('guaranteedMoney')}" th:errors="*{guaranteedMoney}">Invalid</div>
+
+        <label for="contractStatus">Contract Status</label>
+        <select id="contractStatus" th:field="*{contractStatus}" required>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="EXPIRED">EXPIRED</option>
+            <option value="RELEASED">RELEASED</option>
+            <option value="PRACTICE_SQUAD">PRACTICE_SQUAD</option>
+        </select>
+        <div class="field-error" th:if="${#fields.hasErrors('contractStatus')}" th:errors="*{contractStatus}">Invalid</div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Save</button>
+            <a class="btn secondary" th:href="@{/contracts}">Cancel</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

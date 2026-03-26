@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Contract Report</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Salary Cap Report</h1>
+
+    <form method="get" th:action="@{/reports}" th:object="${filter}">
+        <div class="grid">
+            <div>
+                <label for="teamId">Team</label>
+                <select id="teamId" th:field="*{teamId}">
+                    <option value="">All Teams</option>
+                    <option th:each="t : ${teams}" th:value="${t.teamId}" th:text="${t.teamName}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="positionId">Position</label>
+                <select id="positionId" th:field="*{positionId}">
+                    <option value="">All Positions</option>
+                    <option th:each="p : ${positions}" th:value="${p.positionId}" th:text="${p.positionName}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="contractStatus">Contract Status</label>
+                <select id="contractStatus" th:field="*{contractStatus}">
+                    <option value="">All Statuses</option>
+                    <option th:each="status : ${contractStatuses}" th:value="${status}" th:text="${status}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="minAge">Min Age</label>
+                <input id="minAge" type="number" th:field="*{minAge}">
+            </div>
+            <div>
+                <label for="maxAge">Max Age</label>
+                <input id="maxAge" type="number" th:field="*{maxAge}">
+            </div>
+            <div>
+                <label for="minCapHit">Min Cap Hit</label>
+                <input id="minCapHit" type="number" step="0.01" th:field="*{minCapHit}">
+            </div>
+            <div>
+                <label for="maxCapHit">Max Cap Hit</label>
+                <input id="maxCapHit" type="number" step="0.01" th:field="*{maxCapHit}">
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Apply Filters</button>
+            <a class="btn secondary" th:href="@{/reports}">Reset</a>
+            <a class="btn secondary" th:href="@{/contracts}">Back to Contracts</a>
+        </div>
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Player</th>
+            <th>Team</th>
+            <th>Position</th>
+            <th>Age</th>
+            <th>Base Salary</th>
+            <th>Cap Hit</th>
+            <th>Guaranteed Money</th>
+            <th>Contract Status</th>
+            <th>Years Remaining</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="row : ${rows}">
+            <td th:text="${row.player.fullName}">Player</td>
+            <td th:text="${row.player.team.teamName}">Team</td>
+            <td th:text="${row.player.position.positionName}">Position</td>
+            <td th:text="${row.player.age}">Age</td>
+            <td th:text="${#numbers.formatDecimal(row.baseSalary, 1, 'COMMA', 2, 'POINT')}">0</td>
+            <td th:text="${#numbers.formatDecimal(row.capHit, 1, 'COMMA', 2, 'POINT')}">0</td>
+            <td th:text="${#numbers.formatDecimal(row.guaranteedMoney, 1, 'COMMA', 2, 'POINT')}">0</td>
+            <td th:text="${row.contractStatus}">ACTIVE</td>
+            <td th:text="${row.yearsRemaining}">0</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
