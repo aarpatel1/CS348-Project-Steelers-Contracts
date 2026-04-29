@@ -38,3 +38,14 @@ CREATE TABLE contracts (
     contract_status VARCHAR(25) NOT NULL,
     CONSTRAINT fk_contract_player FOREIGN KEY (player_id) REFERENCES players(player_id)
 );
+
+-- Stage 3 indexes: accelerate report filters, joins, dropdowns, and CRUD lookups.
+CREATE INDEX idx_players_team_id ON players(team_id);
+CREATE INDEX idx_players_position_id ON players(position_id);
+CREATE INDEX idx_players_last_first_name ON players(last_name, first_name);
+CREATE INDEX idx_players_age ON players(age);
+
+CREATE INDEX idx_contracts_player_id ON contracts(player_id);
+CREATE INDEX idx_contracts_status ON contracts(contract_status);
+CREATE INDEX idx_contracts_cap_hit ON contracts(cap_hit);
+CREATE INDEX idx_contracts_player_years ON contracts(player_id, start_year, end_year);

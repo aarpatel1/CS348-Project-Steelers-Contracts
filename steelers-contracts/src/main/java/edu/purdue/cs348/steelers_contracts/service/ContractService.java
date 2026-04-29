@@ -6,7 +6,8 @@ import edu.purdue.cs348.steelers_contracts.model.Player;
 import edu.purdue.cs348.steelers_contracts.repository.ContractRepository;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,15 +30,21 @@ public class ContractService {
                 .orElseThrow(() -> new IllegalArgumentException("Contract not found: " + contractId));
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Contract createContract(Contract contract, Long playerId) {
-        Player player = playerService.getPlayerById(playerId);
+        // Locking the player row in this transaction prevents concurrent users from
+        // passing overlap checks at the same time and inserting conflicting contracts.
+        Player player = playerService.getPlayerByIdForUpdate(playerId);
+        validateNoYearOverlap(playerId, contract.getStartYear(), contract.getEndYear(), null);
         contract.setPlayer(player);
         return contractRepository.save(contract);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Contract updateContract(Long contractId, Contract updatedContract, Long playerId) {
         Contract existing = getContractById(contractId);
-        Player player = playerService.getPlayerById(playerId);
+        Player player = playerService.getPlayerByIdForUpdate(playerId);
+        validateNoYearOverlap(playerId, updatedContract.getStartYear(), updatedContract.getEndYear(), contractId);
 
         existing.setPlayer(player);
         existing.setStartYear(updatedContract.getStartYear());
@@ -51,22 +58,24 @@ public class ContractService {
         return contractRepository.save(existing);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteContract(Long contractId) {
         contractRepository.deleteById(contractId);
     }
 
-    // Stage 2 report: apply user-selected filters in one place for easy demo explanation.
+    // JPA binds each filter as a typed parameter instead of string-concatenating SQL,
+    // which blocks SQL injection attempts in report/search inputs.
     public List<Contract> getFilteredContracts(ReportFilter filter) {
-        return getAllContracts().stream()
-                .filter(c -> filter.getTeamId() == null || c.getPlayer().getTeam().getTeamId().equals(filter.getTeamId()))
-                .filter(c -> filter.getPositionId() == null || c.getPlayer().getPosition().getPositionId().equals(filter.getPositionId()))
-                .filter(c -> filter.getMinAge() == null || c.getPlayer().getAge() >= filter.getMinAge())
-                .filter(c -> filter.getMaxAge() == null || c.getPlayer().getAge() <= filter.getMaxAge())
-                .filter(c -> filter.getMinCapHit() == null || c.getCapHit().compareTo(BigDecimal.valueOf(filter.getMinCapHit())) >= 0)
-                .filter(c -> filter.getMaxCapHit() == null || c.getCapHit().compareTo(BigDecimal.valueOf(filter.getMaxCapHit())) <= 0)
-                .filter(c -> filter.getContractStatus() == null || filter.getContractStatus().isBlank()
-                        || c.getContractStatus().equalsIgnoreCase(filter.getContractStatus()))
-                .collect(Collectors.toList());
+        String status = normalizeStatus(filter.getContractStatus());
+        return contractRepository.findFilteredContracts(
+                filter.getTeamId(),
+                filter.getPositionId(),
+                filter.getMinAge(),
+                filter.getMaxAge(),
+                filter.getMinCapHit() == null ? null : BigDecimal.valueOf(filter.getMinCapHit()),
+                filter.getMaxCapHit() == null ? null : BigDecimal.valueOf(filter.getMaxCapHit()),
+                status
+        );
     }
 
     public List<String> getAllContractStatuses() {
@@ -75,5 +84,25 @@ public class ContractService {
                 .distinct()
                 .sorted()
                 .toList();
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+        return status.trim();
+    }
+
+    private void validateNoYearOverlap(Long playerId, Integer startYear, Integer endYear, Long excludeContractId) {
+        if (startYear != null && endYear != null && startYear >= endYear) {
+            throw new IllegalArgumentException("Start year must be less than end year.");
+        }
+        // Overlap uses interval logic [startYear, endYear):
+        // existing.start < new.end AND existing.end > new.start
+        // This allows adjacent contracts where one ends exactly when the next starts.
+        boolean overlap = contractRepository.existsOverlappingContractYears(playerId, startYear, endYear, excludeContractId);
+        if (overlap) {
+            throw new IllegalArgumentException("This player already has a contract that overlaps those years.");
+        }
     }
 }

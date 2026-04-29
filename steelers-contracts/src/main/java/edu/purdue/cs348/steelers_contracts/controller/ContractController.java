@@ -55,7 +55,15 @@ public class ContractController {
             return "contracts/form";
         }
 
-        contractService.createContract(contract, playerId);
+        try {
+            contractService.createContract(contract, playerId);
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("players", playerService.getAllPlayersForDropdown());
+            model.addAttribute("formAction", "/contracts");
+            model.addAttribute("pageTitle", "Create Contract");
+            model.addAttribute("formError", ex.getMessage());
+            return "contracts/form";
+        }
         return "redirect:/contracts";
     }
 
@@ -82,7 +90,15 @@ public class ContractController {
             return "contracts/form";
         }
 
-        contractService.updateContract(id, contract, playerId);
+        try {
+            contractService.updateContract(id, contract, playerId);
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("players", playerService.getAllPlayersForDropdown());
+            model.addAttribute("formAction", "/contracts/" + id + "/edit");
+            model.addAttribute("pageTitle", "Edit Contract");
+            model.addAttribute("formError", ex.getMessage());
+            return "contracts/form";
+        }
         return "redirect:/contracts";
     }
 

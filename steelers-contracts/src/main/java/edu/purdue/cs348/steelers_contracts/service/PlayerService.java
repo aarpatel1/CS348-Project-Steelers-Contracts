@@ -22,4 +22,9 @@ public class PlayerService {
         return playerRepository.findById(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Player not found: " + playerId));
     }
+
+    public Player getPlayerByIdForUpdate(Long playerId) {
+        return playerRepository.findByPlayerId(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Player not found: " + playerId));
+    }
 }

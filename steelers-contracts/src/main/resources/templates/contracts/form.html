@@ -8,6 +8,7 @@
 <body>
 <div class="container">
     <h1 th:text="${pageTitle}">Contract Form</h1>
+    <div class="field-error" th:if="${formError}" th:text="${formError}">Validation error</div>
 
     <form th:action="${formAction}" method="post" th:object="${contract}">
         <label for="playerId">Player</label>
