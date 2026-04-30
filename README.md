@@ -38,3 +38,8 @@ Notes:
 I used Cursor/AI to help generate code structure, SQL ideas, and UI scaffolding.
 I reviewed, tested, and modified the output.
 I understand and can explain the final code.
+
+## Stage 3 Artifacts
+- `STAGE3_NOTES.md` - SQL injection protection, indexes, and transaction/isolation rationale.
+- `DEPLOYMENT.md` - extra credit deployment instructions and verification checklist.
+- `DEMO_SCRIPT_STAGE3.md` - 5-10 minute demo script and final submission checklist.

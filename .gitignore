@@ -17,3 +17,6 @@ Thumbs.db
 # Env / secrets
 .env
 application-local.properties
+
+DEMO_SCRIPT_STAGE3.md
+DEPLOYMENT.md
